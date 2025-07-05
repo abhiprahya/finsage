@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Download, Calendar, Filter, Eye, Share } from 'lucide-react';
+import { FileText, Download, Calendar, Filter, Eye, Share, Upload, Search, Users, Building, Globe, Shield } from 'lucide-react';
 import type { User } from '../App';
 
 interface ReportsPageProps {
@@ -9,6 +9,10 @@ interface ReportsPageProps {
 export const ReportsPage: React.FC<ReportsPageProps> = ({ user }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPeriod, setSelectedPeriod] = useState('monthly');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedAccount, setSelectedAccount] = useState('all');
+  const [selectedCompliance, setSelectedCompliance] = useState('all');
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   const reports = [
     {
@@ -20,6 +24,9 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ user }) => {
       generatedDate: '2024-07-01',
       description: 'Comprehensive overview of cloud spending across all business units',
       status: 'ready',
+      account: 'HDFC Bank Ltd.',
+      compliance: ['RBI', 'PCI'],
+      country: 'India',
       metrics: {
         totalPages: 24,
         charts: 12,
@@ -35,6 +42,9 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ user }) => {
       generatedDate: '2024-07-01',
       description: 'Detailed compliance status for PCI, IRDAI, and SOC 2 requirements',
       status: 'ready',
+      account: 'HDFC Bank Ltd.',
+      compliance: ['PCI', 'IRDAI', 'SOC2'],
+      country: 'India',
       metrics: {
         totalPages: 45,
         charts: 18,
@@ -50,6 +60,9 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ user }) => {
       generatedDate: '2024-07-01',
       description: 'High-level financial operations summary for leadership',
       status: 'ready',
+      account: 'HDFC Bank Ltd.',
+      compliance: ['RBI'],
+      country: 'India',
       metrics: {
         totalPages: 8,
         charts: 6,
@@ -65,6 +78,9 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ user }) => {
       generatedDate: '2024-07-02',
       description: 'AI-powered cost predictions and scenario analysis',
       status: 'processing',
+      account: 'HDFC Bank Ltd.',
+      compliance: ['RBI', 'DPDP'],
+      country: 'India',
       metrics: {
         totalPages: 32,
         charts: 20,
@@ -80,25 +96,13 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ user }) => {
       generatedDate: '2024-07-01',
       description: 'Detailed cost allocation per business unit with drill-down data',
       status: 'ready',
+      account: 'HDFC Bank Ltd.',
+      compliance: ['RBI'],
+      country: 'India',
       metrics: {
         totalPages: 12,
         charts: 8,
         tables: 20
-      }
-    },
-    {
-      id: 6,
-      name: 'Security & Compliance Scorecard',
-      category: 'compliance',
-      type: 'PDF',
-      size: '1.8 MB',
-      generatedDate: '2024-06-30',
-      description: 'Monthly security posture and compliance score assessment',
-      status: 'ready',
-      metrics: {
-        totalPages: 16,
-        charts: 10,
-        tables: 6
       }
     }
   ];
@@ -112,36 +116,46 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ user }) => {
     { id: 'chargeback', name: 'Chargeback', count: reports.filter(r => r.category === 'chargeback').length }
   ];
 
-  const scheduledReports = [
-    {
-      id: 1,
-      name: 'Weekly Cost Summary',
-      frequency: 'Weekly',
-      nextRun: '2024-07-08',
-      enabled: true,
-      recipients: ['sarah.johnson@company.com', 'finops-team@company.com']
-    },
-    {
-      id: 2,
-      name: 'Monthly Compliance Report',
-      frequency: 'Monthly',
-      nextRun: '2024-08-01',
-      enabled: true,
-      recipients: ['ciso@company.com', 'compliance-team@company.com']
-    },
-    {
-      id: 3,
-      name: 'Quarterly Executive Summary',
-      frequency: 'Quarterly',
-      nextRun: '2024-10-01',
-      enabled: false,
-      recipients: ['cfo@company.com', 'executive-team@company.com']
-    }
+  const accounts = [
+    { id: 'all', name: 'All Accounts' },
+    { id: 'hdfc', name: 'HDFC Bank Ltd.' },
+    { id: 'icici', name: 'ICICI Bank Ltd.' },
+    { id: 'axis', name: 'Axis Bank Ltd.' },
+    { id: 'sbi', name: 'State Bank of India' }
   ];
 
-  const filteredReports = selectedCategory === 'all' 
-    ? reports 
-    : reports.filter(report => report.category === selectedCategory);
+  const complianceFilters = [
+    { id: 'all', name: 'All Compliance' },
+    { id: 'rbi', name: 'RBI Guidelines' },
+    { id: 'pci', name: 'PCI-DSS' },
+    { id: 'irdai', name: 'IRDAI' },
+    { id: 'dpdp', name: 'DPDP Act' },
+    { id: 'soc2', name: 'SOC 2' }
+  ];
+
+  const filteredReports = reports.filter(report => {
+    const matchesCategory = selectedCategory === 'all' || report.category === selectedCategory;
+    const matchesSearch = report.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         report.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesAccount = selectedAccount === 'all' || report.account.toLowerCase().includes(selectedAccount);
+    const matchesCompliance = selectedCompliance === 'all' || 
+                             report.compliance.some(c => c.toLowerCase().includes(selectedCompliance));
+    
+    return matchesCategory && matchesSearch && matchesAccount && matchesCompliance;
+  });
+
+  const handleDownload = (reportId: number, format: string) => {
+    console.log(`Downloading report ${reportId} as ${format}`);
+    // Simulate download
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      console.log('Uploading files:', Array.from(files).map(f => f.name));
+      setShowUploadModal(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -175,20 +189,74 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ user }) => {
           <p className="text-gray-600">Access and manage your financial operations reports</p>
         </div>
         <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setShowUploadModal(true)}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Upload className="w-4 h-4" />
+            <span>Upload Report</span>
+          </button>
+          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <Calendar className="w-4 h-4" />
+            <span>Generate Report</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Advanced Filters */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search reports..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          
+          <select
+            value={selectedAccount}
+            onChange={(e) => setSelectedAccount(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            {accounts.map(account => (
+              <option key={account.id} value={account.id}>{account.name}</option>
+            ))}
+          </select>
+
+          <select
+            value={selectedCompliance}
+            onChange={(e) => setSelectedCompliance(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            {complianceFilters.map(filter => (
+              <option key={filter.id} value={filter.id}>{filter.name}</option>
+            ))}
+          </select>
+
           <select
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
             <option value="quarterly">Quarterly</option>
             <option value="yearly">Yearly</option>
           </select>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <Calendar className="w-4 h-4" />
-            <span>Generate Report</span>
-          </button>
+
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            {categories.map(category => (
+              <option key={category.id} value={category.id}>{category.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -243,6 +311,36 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ user }) => {
               </div>
             </div>
 
+            {/* Report Metadata */}
+            <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+              <div className="flex items-center space-x-2">
+                <Building className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600">{report.account}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Globe className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600">{report.country}</span>
+              </div>
+            </div>
+
+            {/* Compliance Tags */}
+            <div className="flex items-center space-x-2 mb-4">
+              <Shield className="w-4 h-4 text-gray-400" />
+              <div className="flex space-x-1">
+                {report.compliance.map((comp) => (
+                  <span key={comp} className={`px-2 py-1 text-xs rounded-full font-medium ${
+                    comp === 'PCI' ? 'bg-red-100 text-red-800' :
+                    comp === 'RBI' ? 'bg-blue-100 text-blue-800' :
+                    comp === 'IRDAI' ? 'bg-orange-100 text-orange-800' :
+                    comp === 'DPDP' ? 'bg-purple-100 text-purple-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {comp}
+                  </span>
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
               <div className="text-center p-2 bg-gray-50 rounded">
                 <div className="font-semibold text-gray-900">{report.metrics.totalPages}</div>
@@ -269,107 +367,124 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ user }) => {
                   <span>Share</span>
                 </button>
               </div>
-              <button 
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  report.status === 'ready' 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-                disabled={report.status !== 'ready'}
-              >
-                <Download className="w-4 h-4" />
-                <span>Download</span>
-              </button>
+              
+              {/* Download Options */}
+              <div className="relative group">
+                <button 
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    report.status === 'ready' 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                  disabled={report.status !== 'ready'}
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download</span>
+                </button>
+                
+                {report.status === 'ready' && (
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                    <button
+                      onClick={() => handleDownload(report.id, 'pdf')}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Download as PDF
+                    </button>
+                    <button
+                      onClick={() => handleDownload(report.id, 'excel')}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Download as Excel
+                    </button>
+                    <button
+                      onClick={() => handleDownload(report.id, 'csv')}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Download as CSV
+                    </button>
+                    <button
+                      onClick={() => handleDownload(report.id, 'docx')}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Download as Word
+                    </button>
+                    <button
+                      onClick={() => handleDownload(report.id, 'zip')}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Download as ZIP
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Scheduled Reports */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Scheduled Reports</h2>
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              <Calendar className="w-4 h-4" />
-              <span>Add Schedule</span>
-            </button>
-          </div>
-        </div>
-        <div className="p-6">
-          <div className="space-y-4">
-            {scheduledReports.map((schedule) => (
-              <div key={schedule.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="font-medium text-gray-900">{schedule.name}</h3>
-                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                      schedule.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {schedule.enabled ? 'Active' : 'Paused'}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
-                    <span>Frequency: {schedule.frequency}</span>
-                    <span>Next run: {schedule.nextRun}</span>
-                    <span>Recipients: {schedule.recipients.length}</span>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <button className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors">
-                    Edit
-                  </button>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={schedule.enabled}
-                      onChange={() => {}}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Report</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Report Category</label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <option value="cost">Cost Report</option>
+                  <option value="compliance">Compliance Report</option>
+                  <option value="executive">Executive Summary</option>
+                  <option value="forecast">Forecast Analysis</option>
+                  <option value="chargeback">Chargeback Report</option>
+                </select>
               </div>
-            ))}
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Account</label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <option value="hdfc">HDFC Bank Ltd.</option>
+                  <option value="icici">ICICI Bank Ltd.</option>
+                  <option value="axis">Axis Bank Ltd.</option>
+                  <option value="sbi">State Bank of India</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Files</label>
+                <label className="flex items-center justify-center w-full p-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 transition-colors">
+                  <div className="text-center">
+                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <span className="text-sm text-gray-600">Choose files to upload</span>
+                    <p className="text-xs text-gray-500 mt-1">PDF, Excel, CSV, Word, ZIP files supported</p>
+                  </div>
+                  <input
+                    type="file"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    multiple
+                    accept=".pdf,.xlsx,.xls,.csv,.docx,.doc,.zip"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="flex space-x-3 pt-4">
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Upload
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FileText className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-medium text-gray-900">Custom Report</h3>
-              <p className="text-sm text-gray-600">Build a custom report with specific metrics</p>
-            </div>
-          </button>
-          
-          <button className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Download className="w-5 h-5 text-green-600" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-medium text-gray-900">Export Data</h3>
-              <p className="text-sm text-gray-600">Export raw data for external analysis</p>
-            </div>
-          </button>
-          
-          <button className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Calendar className="w-5 h-5 text-purple-600" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-medium text-gray-900">Schedule Report</h3>
-              <p className="text-sm text-gray-600">Set up automated report delivery</p>
-            </div>
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
