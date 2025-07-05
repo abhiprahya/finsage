@@ -9,6 +9,7 @@ import {
   FileText,
   Scale,
   Cpu,
+  BookOpen,
   ChevronRight 
 } from 'lucide-react';
 import type { User, Page } from '../App';
@@ -24,6 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ user, currentPage, onPageChang
     { id: 'dashboard' as Page, label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, roles: ['CFO', 'FinOps Analyst', 'Cloud Manager', 'CISO', 'Compliance Officer'] },
     { id: 'cloud-integration' as Page, label: 'Cloud Integration', icon: <Cloud className="w-5 h-5" />, roles: ['Cloud Manager', 'FinOps Analyst'] },
     { id: 'compliance' as Page, label: 'Compliance Costs', icon: <Shield className="w-5 h-5" />, roles: ['CISO', 'CFO', 'FinOps Analyst', 'Compliance Officer'] },
+    { id: 'compliance-frameworks' as Page, label: 'Compliance Frameworks', icon: <BookOpen className="w-5 h-5" />, roles: ['CFO', 'FinOps Analyst', 'Cloud Manager', 'CISO', 'Compliance Officer'] },
     { id: 'forecast' as Page, label: 'AI Forecast', icon: <TrendingUp className="w-5 h-5" />, roles: ['CFO', 'FinOps Analyst'] },
     { id: 'regulatory-impact' as Page, label: 'Regulatory Impact', icon: <Scale className="w-5 h-5" />, roles: ['CFO', 'Compliance Officer', 'CISO'] },
     { id: 'ai-optimization' as Page, label: 'AI Optimization', icon: <Cpu className="w-5 h-5" />, roles: ['FinOps Analyst', 'Cloud Manager'] },

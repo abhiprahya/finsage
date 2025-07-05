@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, AlertTriangle, CheckCircle, Filter, Download, Calendar } from 'lucide-react';
+import { Shield, AlertTriangle, CheckCircle, Filter, Download, Calendar, BookOpen } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line } from 'recharts';
 import type { User } from '../App';
 
@@ -12,84 +12,156 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({ user }
   const [selectedCompliance, setSelectedCompliance] = useState('all');
 
   const complianceSpendData = [
-    { name: 'PCI Compliance', value: 45000, color: '#EF4444', percentage: 38 },
-    { name: 'IRDAI Requirements', value: 32000, color: '#F59E0B', percentage: 27 },
-    { name: 'PII Protection', value: 28000, color: '#8B5CF6', percentage: 24 },
-    { name: 'SOC 2', value: 13000, color: '#06B6D4', percentage: 11 },
+    { name: 'RBI Guidelines', value: 78000, color: '#EF4444', percentage: 35, type: 'Mandatory' },
+    { name: 'IRDAI Requirements', value: 45000, color: '#F59E0B', percentage: 20, type: 'Mandatory' },
+    { name: 'PCI-DSS 4.0', value: 42000, color: '#8B5CF6', percentage: 19, type: 'Mandatory' },
+    { name: 'DPDP Act', value: 32000, color: '#10B981', percentage: 14, type: 'Mandatory' },
+    { name: 'MeitY Policy', value: 25000, color: '#3B82F6', percentage: 11, type: 'Mandatory' },
+    { name: 'ISO 27001', value: 18000, color: '#6B7280', percentage: 8, type: 'Advisory' },
   ];
 
   const monthlyComplianceData = [
-    { month: 'Jan', PCI: 38000, IRDAI: 28000, PII: 22000, SOC2: 10000 },
-    { month: 'Feb', PCI: 42000, IRDAI: 30000, PII: 24000, SOC2: 11000 },
-    { month: 'Mar', PCI: 45000, IRDAI: 32000, PII: 28000, SOC2: 13000 },
-    { month: 'Apr', PCI: 48000, IRDAI: 35000, PII: 30000, SOC2: 14000 },
-    { month: 'May', PCI: 52000, IRDAI: 38000, PII: 32000, SOC2: 15000 },
-    { month: 'Jun', PCI: 55000, IRDAI: 40000, PII: 35000, SOC2: 16000 },
+    { month: 'Jan', RBI: 68000, IRDAI: 38000, PCI: 35000, DPDP: 28000, MeitY: 22000, ISO: 15000 },
+    { month: 'Feb', RBI: 72000, IRDAI: 40000, PCI: 37000, DPDP: 29000, MeitY: 23000, ISO: 16000 },
+    { month: 'Mar', RBI: 75000, IRDAI: 42000, PCI: 39000, DPDP: 30000, MeitY: 24000, ISO: 17000 },
+    { month: 'Apr', RBI: 76000, IRDAI: 43000, PCI: 40000, DPDP: 31000, MeitY: 24500, ISO: 17500 },
+    { month: 'May', RBI: 77000, IRDAI: 44000, PCI: 41000, DPDP: 31500, MeitY: 24800, ISO: 17800 },
+    { month: 'Jun', RBI: 78000, IRDAI: 45000, PCI: 42000, DPDP: 32000, MeitY: 25000, ISO: 18000 },
   ];
 
   const complianceAlerts = [
     {
       id: 1,
       type: 'critical',
-      title: 'PCI Compliance Breach Risk',
-      description: 'Unencrypted RDS instance detected in PCI environment',
-      resource: 'rds-prod-payments-001',
+      title: 'RBI Data Localization Breach Risk',
+      description: 'Resources detected outside approved Indian regions',
+      resource: 'rds-prod-customer-data',
+      framework: 'RBI Guidelines',
       time: '15 minutes ago',
-      cost: '$2,400/month'
+      cost: '$4,200/month',
+      action: 'Migrate to India regions'
     },
     {
       id: 2,
       type: 'warning',
-      title: 'IRDAI Data Residency Violation',
-      description: 'Resources deployed outside approved Indian regions',
-      resource: 'ec2-analytics-cluster',
+      title: 'PCI-DSS 4.0 Transition Required',
+      description: 'Current PCI-DSS 3.2.1 implementation expires March 2025',
+      resource: 'payment-processing-cluster',
+      framework: 'PCI-DSS',
       time: '2 hours ago',
-      cost: '$3,200/month'
+      cost: '$8,500/month',
+      action: 'Plan v4.0 upgrade'
     },
     {
       id: 3,
-      type: 'info',
-      title: 'SOC 2 Logging Insufficient',
-      description: 'CloudTrail logs retention below compliance requirement',
-      resource: 'cloudtrail-audit-logs',
+      type: 'warning',
+      title: 'IRDAI Audit Trail Insufficient',
+      description: 'Log retention below 7-year requirement for insurance data',
+      resource: 'insurance-data-lake',
+      framework: 'IRDAI',
       time: '4 hours ago',
-      cost: '$150/month'
+      cost: '$1,200/month',
+      action: 'Extend log retention'
+    },
+    {
+      id: 4,
+      type: 'info',
+      title: 'DPDP Act Consent Management Update',
+      description: 'New consent management features available',
+      resource: 'consent-management-system',
+      framework: 'DPDP Act',
+      time: '1 day ago',
+      cost: '$800/month',
+      action: 'Review and implement'
     },
   ];
 
   const complianceMetrics = [
     {
       title: 'Total Compliance Spend',
-      value: '$118,000',
-      change: '+8.4%',
+      value: '$240,000',
+      change: '+12.4%',
       trend: 'up',
-      target: '$125,000',
+      target: '$250,000',
       status: 'good'
     },
     {
       title: 'Policy Violations',
-      value: '3',
-      change: '-2',
+      value: '2',
+      change: '-1',
       trend: 'down',
       target: '0',
       status: 'warning'
     },
     {
       title: 'Compliance Score',
-      value: '94%',
-      change: '+2%',
+      value: '96%',
+      change: '+3%',
       trend: 'up',
       target: '98%',
       status: 'good'
     },
     {
       title: 'At-Risk Resources',
-      value: '12',
-      change: '+3',
+      value: '8',
+      change: '+2',
       trend: 'up',
       target: '0',
       status: 'critical'
     },
+  ];
+
+  const frameworkDetails = [
+    {
+      name: 'RBI Guidelines',
+      status: 'compliant',
+      lastAudit: '2024-05-15',
+      nextReview: '2024-08-15',
+      cost: 78000,
+      requirements: 15,
+      implemented: 14,
+      description: 'Data localization and cloud governance for banks and NBFCs'
+    },
+    {
+      name: 'IRDAI Requirements',
+      status: 'compliant',
+      lastAudit: '2024-04-20',
+      nextReview: '2024-07-20',
+      cost: 45000,
+      requirements: 12,
+      implemented: 12,
+      description: 'Insurance sector cloud and data protection requirements'
+    },
+    {
+      name: 'PCI-DSS 4.0',
+      status: 'in-progress',
+      lastAudit: '2024-03-10',
+      nextReview: '2024-09-10',
+      cost: 42000,
+      requirements: 18,
+      implemented: 15,
+      description: 'Payment card industry data security standards'
+    },
+    {
+      name: 'DPDP Act',
+      status: 'compliant',
+      lastAudit: '2024-06-01',
+      nextReview: '2024-09-01',
+      cost: 32000,
+      requirements: 10,
+      implemented: 10,
+      description: 'Digital Personal Data Protection Act compliance'
+    },
+    {
+      name: 'MeitY Policy',
+      status: 'compliant',
+      lastAudit: '2024-05-01',
+      nextReview: '2024-08-01',
+      cost: 25000,
+      requirements: 8,
+      implemented: 8,
+      description: 'Government cloud policy for empanelled CSPs'
+    }
   ];
 
   return (
@@ -97,8 +169,11 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({ user }
       {/* Header with Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Compliance Cost Dashboard</h1>
-          <p className="text-gray-600">Monitor compliance-related cloud spending and violations</p>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+            <Shield className="w-8 h-8 text-blue-600 mr-3" />
+            Compliance Cost Dashboard
+          </h1>
+          <p className="text-gray-600">Monitor compliance-related cloud spending and regulatory adherence</p>
         </div>
         <div className="flex items-center space-x-3">
           <select
@@ -106,11 +181,13 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({ user }
             onChange={(e) => setSelectedCompliance(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="all">All Compliance Types</option>
-            <option value="pci">PCI Compliance</option>
+            <option value="all">All Frameworks</option>
+            <option value="mandatory">Mandatory Only</option>
+            <option value="advisory">Advisory Only</option>
+            <option value="rbi">RBI Guidelines</option>
             <option value="irdai">IRDAI Requirements</option>
-            <option value="pii">PII Protection</option>
-            <option value="soc2">SOC 2</option>
+            <option value="pci">PCI-DSS</option>
+            <option value="dpdp">DPDP Act</option>
           </select>
           <select
             value={selectedTimeRange}
@@ -141,7 +218,6 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({ user }
                 'bg-red-100 text-red-800'
               }`}>
                 {metric.status === 'good' ? <CheckCircle className="w-3 h-3 mr-1" /> :
-                 metric.status === 'warning' ? <AlertTriangle className="w-3 h-3 mr-1" /> :
                  <AlertTriangle className="w-3 h-3 mr-1" />}
                 {metric.status}
               </span>
@@ -196,6 +272,11 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({ user }
                     style={{ backgroundColor: item.color }}
                   />
                   <span className="text-sm text-gray-700">{item.name}</span>
+                  <span className={`ml-2 text-xs px-2 py-1 rounded-full ${
+                    item.type === 'Mandatory' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {item.type}
+                  </span>
                 </div>
                 <div className="text-right">
                   <span className="text-sm font-medium text-gray-900">${item.value.toLocaleString()}</span>
@@ -216,12 +297,77 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({ user }
                 <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip formatter={(value) => [`$${value.toLocaleString()}`, '']} />
-                <Line type="monotone" dataKey="PCI" stroke="#EF4444" strokeWidth={2} dot={{ fill: '#EF4444', r: 4 }} />
+                <Line type="monotone" dataKey="RBI" stroke="#EF4444" strokeWidth={2} dot={{ fill: '#EF4444', r: 4 }} />
                 <Line type="monotone" dataKey="IRDAI" stroke="#F59E0B" strokeWidth={2} dot={{ fill: '#F59E0B', r: 4 }} />
-                <Line type="monotone" dataKey="PII" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 4 }} />
-                <Line type="monotone" dataKey="SOC2" stroke="#06B6D4" strokeWidth={2} dot={{ fill: '#06B6D4', r: 4 }} />
+                <Line type="monotone" dataKey="PCI" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 4 }} />
+                <Line type="monotone" dataKey="DPDP" stroke="#10B981" strokeWidth={2} dot={{ fill: '#10B981', r: 4 }} />
+                <Line type="monotone" dataKey="MeitY" stroke="#3B82F6" strokeWidth={2} dot={{ fill: '#3B82F6', r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Framework Status Overview */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">Compliance Framework Status</h2>
+            <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-700">
+              <BookOpen className="w-4 h-4" />
+              <span className="text-sm">View Framework Guide</span>
+            </button>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {frameworkDetails.map((framework, index) => (
+              <div key={index} className="p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">{framework.name}</h3>
+                    <p className="text-sm text-gray-600 mt-1">{framework.description}</p>
+                  </div>
+                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                    framework.status === 'compliant' ? 'bg-green-100 text-green-800' :
+                    framework.status === 'in-progress' ? 'bg-orange-100 text-orange-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {framework.status}
+                  </span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">Monthly Cost:</span>
+                    <span className="ml-1 font-medium">${framework.cost.toLocaleString()}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Requirements:</span>
+                    <span className="ml-1 font-medium">{framework.implemented}/{framework.requirements}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Last Audit:</span>
+                    <span className="ml-1 font-medium">{framework.lastAudit}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Next Review:</span>
+                    <span className="ml-1 font-medium">{framework.nextReview}</span>
+                  </div>
+                </div>
+                
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className={`h-2 rounded-full ${
+                      framework.status === 'compliant' ? 'bg-green-500' :
+                      framework.status === 'in-progress' ? 'bg-orange-500' :
+                      'bg-red-500'
+                    }`}
+                    style={{ width: `${(framework.implemented / framework.requirements) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -230,7 +376,7 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({ user }
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Compliance Alerts</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Compliance Alerts & Actions</h2>
             <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-700">
               <Filter className="w-4 h-4" />
               <span className="text-sm">Filter</span>
@@ -256,17 +402,25 @@ export const ComplianceDashboard: React.FC<ComplianceDashboardProps> = ({ user }
                       }`}>
                         {alert.type}
                       </span>
+                      <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
+                        {alert.framework}
+                      </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-1">{alert.description}</p>
+                    <p className="text-sm text-gray-600 mb-2">{alert.description}</p>
                     <div className="flex items-center space-x-4 text-xs text-gray-500">
                       <span>Resource: {alert.resource}</span>
                       <span>Cost Impact: {alert.cost}</span>
                       <span>{alert.time}</span>
                     </div>
                   </div>
-                  <button className="ml-4 px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
-                    Resolve
-                  </button>
+                  <div className="ml-4 flex flex-col space-y-2">
+                    <button className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors">
+                      {alert.action}
+                    </button>
+                    <button className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                      Dismiss
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

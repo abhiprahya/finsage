@@ -9,6 +9,7 @@ import { NotificationSettings } from './components/NotificationSettings';
 import { ReportsPage } from './components/ReportsPage';
 import { RegulatoryImpact } from './components/RegulatoryImpact';
 import { AIOptimization } from './components/AIOptimization';
+import { ComplianceFrameworks } from './components/ComplianceFrameworks';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 
@@ -22,7 +23,7 @@ export interface User {
   avatar?: string;
 }
 
-export type Page = 'dashboard' | 'cloud-integration' | 'compliance' | 'forecast' | 'chargeback' | 'notifications' | 'reports' | 'regulatory-impact' | 'ai-optimization';
+export type Page = 'dashboard' | 'cloud-integration' | 'compliance' | 'forecast' | 'chargeback' | 'notifications' | 'reports' | 'regulatory-impact' | 'ai-optimization' | 'compliance-frameworks';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -61,6 +62,8 @@ function App() {
         return <RegulatoryImpact user={user} />;
       case 'ai-optimization':
         return <AIOptimization user={user} />;
+      case 'compliance-frameworks':
+        return <ComplianceFrameworks user={user} />;
       default:
         return <Dashboard user={user} />;
     }
